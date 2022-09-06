@@ -1,0 +1,8 @@
+# unuseful folers
+venv/
+env/
+__pycache__/
+.vscode
+
+# environment variables
+.env

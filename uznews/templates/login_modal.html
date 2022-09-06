@@ -1,0 +1,35 @@
+
+
+
+<div class="modal fade " id="loginModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered " role="document">
+      <div class="modal-content login-modal">
+        <div class="modal-header border-bottom-0">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">×</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-title text-center mb-4">
+            <h2>Kirish</h2>
+          </div>
+
+          <div class="modal-description text-center mb-4">
+              Lorem, ipsum dolor sit amet consectetur adipisicing elit. Eum quod quas ducimus aliquid quae laborum optio voluptas eius. Perferendis quae ullam accusantium mollitia, sunt fuga minus fugit tempora voluptates et.
+
+          </div>
+
+          <div class="d-flex flex-column text-center">
+              
+            <div class="telegram-login mb-4">
+                {% autoescape off %}{{ telegram_login_widget }}{% endautoescape %}
+
+            </div>
+            
+            <div class="text-center text-muted delimiter">Your privacy is protected</div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

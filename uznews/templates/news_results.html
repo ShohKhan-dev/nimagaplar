@@ -1,0 +1,29 @@
+
+<div class="result-item card bg-dark my-2 p-2 text-left">
+    <h6> 
+        <a href="https://{{item.source}}">
+            <small class="badge badge-primary mr-1">
+                {{item.source}}
+            </small> 
+        </a>
+        
+        <a href="{% url 'category_view' item.category %}">
+            <small class="badge badge-danger mr-1">
+                {{item.category}}
+            </small>
+        </a>
+    </h6>
+
+    <h6 class="item-title">
+        <a class="main-url" target="_blank" href="https://{{item.source}}/{{item.link}}">
+            <strong>{{item.title}}</strong>
+        </a>
+    </h6>
+    
+    <div class="organization-address">
+        <small>
+            <span class="date"><span class="fa fa-calendar-alt"></span> {{item.posted_at|date:'d M Y'}}</span>
+            <span class="viewed"><span class="fa fa-eye"></span> {{item.views}}</span>
+        </small>
+    </div>
+</div>

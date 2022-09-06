@@ -1,0 +1,136 @@
+
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/all.min.css' %}">
+
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    
+
+    {% block links %} {% endblock %}
+
+    <title>{% block title %}{% endblock %}</title>
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+        <a class="navbar-brand" href="{% url 'index' %}"><h3><strong>NimaGaplar</strong></h3></a> 
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+      
+          <div class="collapse navbar-collapse" id="navbarsExample07">
+            <div class="mr-auto"></div>
+
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
+                    
+                    <li class="nav-item ">
+                        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Chiqish</a>
+                    </li>
+
+                {% else %}
+                    <li class="nav-item">
+                        <a href="." class="bt" data-toggle="modal" data-target="#loginModal">
+                            Kirish
+                        </a>  
+                    
+                    </li>
+
+                {% endif %}
+
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+    
+
+    <main class="site-main">
+
+        <div class="telegram-login-modal">
+            {% include "login_modal.html" %}
+        </div>
+        
+    
+
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="masthead text-center mb-2 ">
+                    <div class="inner">
+
+                        <div class="nav-masthead justify-content-center">
+                        
+
+                            <a class="nav-link-cat {% if info.category == 'Mahalliy' %}active {% endif %}" href="{% url 'category_view' 'mahalliy' %}">Mahalliy</a>
+                                    
+                            <a class="nav-link-cat {% if info.category == 'Dunyo' %}active {% endif %}" href="{% url 'category_view' 'dunyo' %}">Dunyo</a>
+                        
+                            <a class="nav-link-cat {% if info.category == 'Jamiyat' %}active {% endif %}" href="{% url 'category_view' 'jamiyat' %}">Jamiyat</a>
+                        
+                            <a class="nav-link-cat {% if info.category == 'Sport' %}active {% endif %}" href="{% url 'category_view' 'sport' %}">Sport</a>
+                        
+                            <a class="nav-link-cat {% if info.category == 'Iqtisodiyot' %}active {% endif %}" href="{% url 'category_view' 'iqtisodiyot' %}">Iqtisodiyot</a>
+                        
+                            <a class="nav-link-cat {% if info.category == 'Texnalogiyalar' %}active {% endif %}" href="{% url 'category_view' 'texnalogiyalar' %}">Texnalogiyalar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+            
+            <div class="row mt-5 text-center">
+                <div class="col-lg-8 mx-auto">
+                    {% block content %}
+                    {% endblock %}
+    
+                </div>
+            </div>
+
+        </main>
+        
+    
+
+        
+        
+        <footer class="mastfoot mt-auto text-center">
+            <p><small><b>Developed by</b> shohjahon</small></p>
+        </footer>
+    </div>
+
+    
+    
+
+    <script src="{% static 'js/jquery-3.5.1.min.js' %}"></script>
+    <script src="{% static 'js/popper.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+    <script src="{% static 'js/cloud.js' %}"></script>
+    <script src="{% static 'js/myscript.js' %}"></script>
+
+
+
+    {% block script %}
+    {% endblock %}
+
+    
+
+    
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% extends 'base.html' %} 
+
+{% block title %}Home page{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h4 class="text-left">{{info.word}} <small>({{info.count}})</small></h4>
+
+    {% for item in page_obj %}
+    
+        {% include "news_results.html" %}
+
+    {% endfor %}
+
+    {% include "pagination.html" %}
+
+</div>
+
+{% endblock %}

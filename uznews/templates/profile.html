@@ -1,0 +1,324 @@
+{% extends 'base.html' %} 
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+
+
+<div class="container">
+
+    <h2 class="mb-4">Welcome back, {{request.user.first_name}}!</h2>
+
+    <form method="POST" id="form" onsubmit="ajax_submit();return false;">
+        
+        
+        
+        <div class="input-group mb-3 justify-content-center">
+            <div class="col-md-8">
+                <input type="text"  class="form-control" placeholder="Keywords" aria-label="Keywords" name="keyword-input" id="keyword-input" aria-describedby="basic-addon1" required>
+
+            </div>
+            
+        </div>
+    </form>
+
+
+
+    
+
+    <div class="chip-field" id="chip-field"> 
+        
+    </div>
+
+    <div class="matched-news" id="matched-news">
+    
+    </div>
+    
+
+    
+
+    <div id="news-list">
+        <!-- {% for key, value in results.items %} 
+
+            <div class="keyword-menu mt-4">
+                <a href="{% url 'query_news' key %}" class="btn btn-sm btn-dark float-right">Barchasi</a>
+                <h4 class="text-left">{{key}} <small>({{value.count}})</small></h4>
+            </div>
+            
+            {% for item in value|slice:":5" %}
+                {% include "news_results.html" %}
+            {% endfor %}    
+        {% endfor %} -->
+
+    </div>
+
+    <style>
+        .highlight{
+            color: yellow;
+        }
+    </style>
+
+    <div class="push"></div>
+
+
+</div>
+
+<script>
+    const chips = document.getElementById('chip-field');
+    const matchings = document.getElementById('matched-news');
+    const keyword_in = document.getElementById('keyword-input');
+    const news_list = document.getElementById('news-list');
+
+    function makehtml(res){
+
+        const keyword_data = res.words;
+        const news = res.news;
+        const matchs = res.matches;
+        const keywords = res.keywords
+
+        // console.log(news);
+
+        if (matchs.length > 0){
+            matchings.innerHTML = `<h2 class="my-4">Mos tushgan umumiy so'zlarga natijalar (${matchs.length})</h2>`
+        }
+        else{
+            matchings.innerHTML = `<h2 class="my-4">Kiritilgan so'zlarga umumiy natijalar topilmadi!</h2>`
+        }
+
+
+        matchs.forEach(item=> {
+
+            var checkString = item.title;
+        
+
+            const pattern = new RegExp(`(${keywords.join('|')})`, 'gi'); 
+
+            const mytitle = checkString.replace(pattern, match => `<span class="highlight">${match}</span>`);
+
+            
+            
+            matchings.innerHTML += `
+                <div class="result-item card bg-dark my-2 p-2 text-left">
+                    <h6> 
+                        <a href="https://${item.source}">
+                            <small class="badge badge-primary mr-1">
+                                ${item.source}
+                            </small> 
+                        </a>
+                        
+                        <a href=/category/${item.category}>
+                            <small class="badge badge-danger mr-1">
+                                ${item.category}
+                            </small>
+                        </a>
+                    </h6>
+
+                    <h6 class="item-title">
+                        <a class="main-url" target="_blank" href="https://${item.source}/${item.link}">
+                            <strong>${mytitle}</strong>
+                        </a>
+                    </h6>
+                    
+                    <div class="organization-address">
+                        <small>
+                            <span class="date"><span class="fa fa-calendar-alt"></span> ${item.posted_at}</span>
+                            <span class="viewed"><span class="fa fa-eye"></span> ${item.views}</span>
+                        </small>
+                    </div>
+                </div>`
+            })
+
+
+        
+
+        if (Array.isArray(keyword_data)){
+            chips.innerHTML = ""
+            keyword_data.forEach(model=> {
+                chips.innerHTML += `<div class="chip" id="word-${model.id}"> 
+                                        ${model.word} 
+                                        <span class="closebtn" onClick="removeword(${model.id})">&times;</span>
+                                    </div>`
+
+            })
+        }
+
+        news_list.innerHTML = ""
+
+        for (var key in news){
+
+            if (Array.isArray(news[key])){
+
+                const value = news[key];
+
+                const all_url = "/news/"+key;
+
+                if (value.length == 0){
+                    news_list.innerHTML += `<h4 class="text-left">${key} <small>(${value.length})</small></h4>`
+                    
+                }
+
+                else{
+                    news_list.innerHTML += `<div class="keyword-menu mt-4">
+                                            <a href=${all_url} class="btn btn-sm btn-dark float-right">Barchasi</a>
+                                            <h4 class="text-left">${key} <small>(${value.length})</small></h4>
+                                        </div>`
+
+                    const slicedArray = news[key].slice(0, 5);
+
+
+                    slicedArray.forEach(item=> {
+                        const cat_url = "/category/"+item.category;
+
+                        var mytitle = item.title;
+
+                        var checkString = item.title;
+
+                        var start = item.title.toLowerCase().indexOf(key);
+                    
+
+                        if (start==0 || mytitle[start-1] == " "){
+                            var end = key.slice().length;
+
+                            var matchWord = checkString.substring(start,start+end);
+
+                            if (checkString.toLowerCase().match(key)) {
+                                mytitle = (checkString.replace(matchWord,'<span class="highlight">'+matchWord+'</span>'))
+                            }
+
+                        }
+                        
+
+                        news_list.innerHTML += `
+                            <div class="result-item card bg-dark my-2 p-2 text-left">
+                                <h6> 
+                                    <a href="https://${item.source}">
+                                        <small class="badge badge-primary mr-1">
+                                            ${item.source}
+                                        </small> 
+                                    </a>
+                                    
+                                    <a href=${cat_url}>
+                                        <small class="badge badge-danger mr-1">
+                                            ${item.category}
+                                        </small>
+                                    </a>
+                                </h6>
+
+                                <h6 class="item-title">
+                                    <a class="main-url" target="_blank" href="https://${item.source}/${item.link}">
+                                        <strong>${mytitle}</strong>
+                                    </a>
+                                </h6>
+                                
+                                <div class="organization-address">
+                                    <small>
+                                        <span class="date"><span class="fa fa-calendar-alt"></span> ${item.posted_at}</span>
+                                        <span class="viewed"><span class="fa fa-eye"></span> ${item.views}</span>
+                                    </small>
+                                </div>
+                            </div>`
+                    })
+
+                }
+                
+            }
+        }
+
+        
+
+
+
+    };
+
+        
+
+        
+
+
+
+    function ajax_submit()
+    {
+          
+        
+        $.ajax({
+            type : "POST", 
+            url: "{% url 'profile' %}",
+            data: {
+                keywords : $('#keyword-input').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+        
+            },
+            dataType: "json",
+            
+            success: function(res){
+                keyword_in.value = '';
+                
+                // const data = res.words;
+
+                makehtml(res);
+            },
+        
+            failure: function() {
+                
+            }
+        
+        
+        });
+                  
+    };
+
+    function removeword(id) {
+            $.ajax({
+                url: '{% url "profile" %}',
+                data: {
+                    'id': id,
+                },
+                dataType: 'json',
+                
+                success: function (res) {
+
+                    // const data = res.words;
+
+                    makehtml(res);
+
+                    $("#word-" + id).remove();
+                    
+
+                }
+            });
+        };
+
+
+
+    window.onload = function() {
+
+        $.ajax({
+            url: "{% url 'profile' %}",
+            data: {
+                'send':'sendata'
+            },
+
+            dataType: "json",
+            
+            success: function(res){
+                keyword_in.value = '';
+                
+                // const data = res.words;
+
+                makehtml(res);
+            },
+        
+            failure: function() {
+                
+            }
+        
+        
+        });
+        
+    };
+</script>
+
+
+
+
+{% endblock %}

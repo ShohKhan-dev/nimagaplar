@@ -1,0 +1,9 @@
+Part#1
+docker build --tag python-django .                            ## Build python=django Image
+docker run --publish 8000:8000 python-django                  ## Set up and publish created Image
+Part#2
+docker-compose build
+docker-compose run --rm app django-admin startproject core .   ## One time command ( NOT NECESSARY !)
+docker-compose up                                              ## Publish docker-compose 
+
+docker exec -it django_container /bin/bash                    ## To run command in terminal

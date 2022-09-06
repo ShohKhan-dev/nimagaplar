@@ -1,0 +1,42 @@
+{% extends 'base.html' %} 
+
+{% block title %}Home page{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    {% if matches.count > 0 %}
+
+        <h2>Mos tushgan umumiy so'zlarga natijalar ({{matches.count}})</h2>
+        <div class="mt-4">
+            {% for item in matches %}
+                {% include "news_results.html" %}
+            {% endfor %}
+
+        </div>
+    {% else %}
+        <h2>Kiritilgan so'zlarga umumiy natijalar topilmadi!</h2>
+
+    {% endif %}
+    
+
+    
+    <h2 class="mt-4">Har bir so'z uchun natijalar</h2>
+
+
+    {% for key, value in results.items %} 
+
+        <div class="keyword-menu mt-2">
+            <a href="{% url 'query_news' key %}" class="btn btn-sm btn-dark float-right">Barchasi</a>
+            <h4 class="text-left">{{key}} <small>({{value.count}})</small></h4>
+        </div>
+        
+        {% for item in value|slice:":5" %}
+            {% include "news_results.html" %}
+        {% endfor %}    
+    {% endfor %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %} 
+
+{% block title %}Category{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+    <h4 class="text-left">{{info.category}} <small>({{info.count}})</small></h4>
+    <div class="category-news-result">
+                    
+
+        {% for item in page_obj %}
+
+            {% include "news_results.html" %}
+            
+        {% endfor %}
+
+
+                            
+    </div>
+
+    {% include "pagination.html" %}
+    
+
+</div>
+
+
+
+
+{% endblock %}
+

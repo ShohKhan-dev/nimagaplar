@@ -1,0 +1,67 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8
+    ports:
+      - 3306:3306
+    volumes:
+      - ~/apps/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=S3cret
+      - MYSQL_PASSWORD=An0thrS3crt
+      - MYSQL_USER=citizix_user
+      - MYSQL_DATABASE=citizix_db
+
+  es:
+    image: elasticsearch:8.4.0
+    environment:
+    - discovery.type=single-node
+    - xpack.security.enabled=false
+    ports:
+      - 9200:9200
+
+  app:
+    build: .
+    volumes:
+      - .:/django
+    ports:
+      - 8000:8000
+    image: app:django
+    container_name: django_container
+    command:  bash -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    depends_on:
+      - mysql
+      - es
+      - redis
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
+
+  celery:
+    build: .
+    command: celery -A core worker -l info
+    volumes:
+      - .:/django
+    depends_on:
+      - mysql
+      - es
+      - redis
+
+  celery-beat:
+    build: .
+    command: celery -A core beat -l info
+    volumes:
+      - .:/django
+    depends_on:
+      - mysql
+      - es
+      - redis
+      - celery
+
+
+
+    
+      
