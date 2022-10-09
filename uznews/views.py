@@ -1,14 +1,13 @@
 
+from unittest import result
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponse
-from django.core.paginator import Paginator
 from uznews.models import *
 
 from django.views.generic import ListView, View
 from django.http import JsonResponse
-from django.db.models import Q
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, Page, EmptyPage, PageNotAnInteger
 
 from datetime import datetime, timedelta
 import pytz
@@ -18,48 +17,62 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 import re
 
-from django.db.models import Q
 from django.contrib.auth import authenticate, login
 
 
-# Create your views here.
 
-# from .documents import NewsDocument
+from .documents import NewsDocument
+
+from elasticsearch_dsl.query import Q
 
 
-# s = NewsDocument.search().query("match", title="andijon")
 
-# for hit in s:
-#     print(
-#         "results: ", hit.title
-#     )
 
 
 def search(words):
 
-    matched_words = []
+    #matches = " ".join(words)
+
+    #q = Q("multi_match", query=matches, fields=['title'])
 
     
-
-    
-    query = Q(title__icontains=words[0])  # empty Q object
+    query = Q('prefix', title=words[0])  # empty Q object
 
     for word in words:
         
-        # 'or' the queries together
-        if News.objects.filter(title__icontains=word).exists():
-            temp_q = query & Q(title__icontains=word)
+        if NewsDocument.search().query('prefix', title=word).count() > 0:
+            temp_q = query & Q('prefix', title=word)
 
-            if News.objects.filter(temp_q).count() > 0:
+            if NewsDocument.search().query(temp_q).count() > 1:
                 query = temp_q
-                matched_words.append(word)
-            
-    
-            print(Q(title__icontains=word))
 
+
+    results = NewsDocument.search().query(query)
+
+
+    # query = NewsDocument.query( 
+    #         Q(
+    #             "range",
+    #             lastModifiedDate={
+    #                 "gte": "now-%dd" % 1,
+    #                 "lt": "now"
+    #             }
+    #         ) & 
+    #         Q('match', title=value2)
+    #     )
+
+    # query = Q(title__icontains=words[0])  # empty Q object
+    # for word in words:
         
+    #     if News.objects.filter(title__icontains=word).exists():
+    #         temp_q = query & Q(title__icontains=word)
 
-    results = News.objects.filter(query).all()
+    #         if News.objects.filter(temp_q).count() > 0:
+    #             query = temp_q
+    #             matched_words.append(word)
+            
+    #         print(Q(title__icontains=word))
+    # results = News.objects.filter(query).all()
 
 
     return results
@@ -68,8 +81,15 @@ def search(words):
 
 def get_query(word):
     today = datetime.now(pytz.timezone('Asia/Tashkent')).date()
+
+
     yesterday = (today-timedelta(1))
-    results = News.objects.filter(Q(posted_at=today) | Q(posted_at=yesterday)).filter(title__iregex=r'\b'+str(word))
+
+    results = NewsDocument.search().query(Q('range', posted_at={"gte":yesterday, "lte":today}) & Q('prefix', title=word))
+
+    print("Get Query: ", results.count())
+
+    #results = News.objects.filter(Q(posted_at=today) | Q(posted_at=yesterday)).filter(title__iregex=r'\b'+str(word))
     
     return results
 
@@ -106,17 +126,17 @@ def get_quaries(keywords):
 
 def index(request):
 
-
-
     all_words = WatchList.objects.all()
     dic = {}
 
     today = datetime.now(pytz.timezone('Asia/Tashkent')).date()
     yesterday = (today-timedelta(1))
 
+    #print(all_words.count())
+
     for word in all_words:
-        results = News.objects.filter(Q(posted_at=today) | Q(posted_at=yesterday)).filter(title__iregex=r'\b'+str(word)).count()
-        if results > 4:
+        results = NewsDocument.search().query(Q('range', posted_at={"gte":yesterday, "lte":today}) & Q('prefix', title=word.word)).count()
+        if results > 2:
             results=results//2
             dic[word] = results
 
@@ -157,21 +177,37 @@ def query_keywords(request):
 
 
 def query_news(request, word):
+    
 
-    results = get_query(word)
+    search = get_query(word)
+
+    limit = settings.POSTS_PER_PAGE
 
 
-    cnt=results.count()
+    q = request.GET.get('q')
+    page = int(request.GET.get('page', '1'))
+    start = (page-1) * limit
+    end = start + limit
 
-    paginator = Paginator(results, 10)
+    results = search[start:end].to_queryset()
 
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    cnt=search.count()
+    
 
+    paginator = Paginator(search, limit)
+
+
+    try:
+        page_obj = paginator.get_page(page)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
+
+    
     info={'word': word, 'count': cnt}
 
-    return render(request, 'query_news.html', {'page_obj': page_obj, 'info': info})
-
+    return render(request, 'query_news.html', {'page_obj': page_obj, 'results':results, 'info': info})
 
 
 
@@ -180,19 +216,36 @@ def category_view(request, category):
     today = datetime.now(pytz.timezone('Asia/Tashkent')).date()
     yesterday = (today-timedelta(1))
 
-    news = News.objects.filter(Q(posted_at=today) | Q(posted_at=yesterday)).filter(category=category)
+    limit = settings.POSTS_PER_PAGE
+
+
+    q = request.GET.get('q')
+    page = int(request.GET.get('page', '1'))
+    start = (page-1) * limit
+    end = start + limit
+
+    #news = News.objects.filter(Q(posted_at=today) | Q(posted_at=yesterday)).filter(category=category)
+    news = NewsDocument.search().query(Q('range', posted_at={"gte":yesterday, "lte":today}) & Q('match', category=category))
+    
+
+    paginator = Paginator(news, limit)
+
+    results = news[start:end].to_queryset()
+
+    try:
+        page_obj = paginator.get_page(page)
+    except PageNotAnInteger:
+        page_obj = paginator.get_page(1)
+    except EmptyPage:
+        page_obj = paginator.get_page(paginator.num_pages)
+    
+
+
     cnt = news.count()
-
-    paginator = Paginator(news, 10)
-
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
     cat = category[0].upper()+category[1:]
-
     info={'category':cat, 'count':cnt}
 
-    return render(request, 'category_view.html', {'page_obj': page_obj, 'info': info})
+    return render(request, 'category_view.html', {'page_obj': page_obj, 'results':results, 'info': info})
 
 
 @login_required

@@ -9,8 +9,6 @@ urlpatterns = [
     path("", views.index, name="index"),
 
     path('keywords/',query_keywords, name='query_keywords'),
-    
-
 
     path('news/<str:word>/', query_news, name='query_news'),
 

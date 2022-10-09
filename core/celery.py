@@ -34,6 +34,6 @@ from celery.schedules import crontab
 app.conf.beat_schedule = {
     'crowling_news_webs': {
         'task': 'crowling_news',
-        'schedule': 30.0,
+        'schedule': 600.0,
     }
 }

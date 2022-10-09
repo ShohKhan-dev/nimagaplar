@@ -18,7 +18,13 @@ class NewsDocument(Document):
 
         # The fields of the model you want to be indexed in Elasticsearch
         fields = [
-            'title'
+            'title',
+            'link',
+            'views',
+            'category',
+            'posted_at',
+            'created_at',
+            'source'
         ]
 
         # Ignore auto updating of Elasticsearch when a model is saved
