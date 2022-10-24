@@ -6,6 +6,15 @@
 
 <div class="container">
 
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-danger">
+            {{ message|safe }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
     {% if matches.count > 0 %}
 
         <h2>Mos tushgan umumiy so'zlarga natijalar ({{matches.count}})</h2>

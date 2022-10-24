@@ -2,19 +2,17 @@
 import random
 from celery import shared_task
 from .models import RandomNumber
-from .crowling import kun_uz, daryo_uz, store_tags, write_data
-
+from .crowling import Crowler
+import time
 
 @shared_task(name="crowling_news")
 def crowler_task():
+    time.sleep(1)
 
-    #ranum = random.randint(0,100)
-    kun_uz()
-    daryo_uz()
-
-    write_data()
-
-    store_tags()
+    
+    crowler = Crowler()
+    crowler.run()
 
 
-    # RandomNumber.objects.create(numb=ranum)
+    ranum = random.randint(0,100)
+    RandomNumber.objects.create(numb=ranum)

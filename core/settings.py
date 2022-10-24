@@ -36,7 +36,7 @@ DEBUG = config('DEBUG', cast=bool)
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 
-ALLOWED_HOSTS = ['nimagaplar.loca.lt', '127.0.0.1']
+ALLOWED_HOSTS = ['nimagaplar.loca.lt', '127.0.0.1', '172.25.208.1']
 
 
 # Application definition
@@ -99,28 +99,29 @@ WSGI_APPLICATION = 'core.wsgi.application'
 #     }
 # }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'citizix_db',
-        'USER': 'citizix_user',
-        'PASSWORD': 'An0thrS3crt',
-        'HOST': 'mysql',
-        'PORT': '3306',
-    }
-}
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': config('DB_NAME'),
-#         'USER': config('DB_USER'),
-#         'PASSWORD': '',
-#         'HOST': config('DB_HOST'),
-#         'PORT': '',
-#         'OPTIONS': {'charset': 'utf8mb4'}-
+#         'NAME': 'citizix_db',
+#         'USER': 'citizix_user',
+#         'PASSWORD': 'An0thrS3crt',
+#         'HOST': 'mysql',
+#         'PORT': '3306',
 #     }
 # }
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': config('DB_ENGINE'),
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
+        'OPTIONS': {'charset': 'utf8mb4'}
+    }
+}
 
 
 
@@ -161,6 +162,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / 'static'
 ]

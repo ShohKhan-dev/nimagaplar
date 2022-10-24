@@ -1,5 +1,3 @@
-
-from unittest import result
 from django.conf import settings
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponse
@@ -19,6 +17,9 @@ import re
 
 from django.contrib.auth import authenticate, login
 
+from django.contrib import messages
+
+
 
 
 from .documents import NewsDocument
@@ -27,98 +28,97 @@ from elasticsearch_dsl.query import Q
 
 
 
+class Helper():
+
+    def clean_keywords(self, text):
+        text = text.replace(",", " ").lower()
+        text = re.sub("[^a-zA-Z' ]+", "", text)
+        keywords = [word.strip().replace("'", "‘") for word in text.split()]
+        return keywords
 
 
-def search(words):
+    def get_quaries(self, keywords, interval): 
+        """
+        Get queries for each word
+        """
 
-    #matches = " ".join(words)
+        results = {}
 
-    #q = Q("multi_match", query=matches, fields=['title'])
+
+        if interval != "barchasi":
+            today, before = self.interval_range(interval)
+
+            for keyword in keywords:
+                results[keyword] = NewsDocument.search().sort('-posted_at').query(Q('range', posted_at={"gte":before, "lte":today}) & Q('prefix', title=keyword))
+
+        else:
+            for keyword in keywords:
+                results[keyword] = NewsDocument.search().sort('-posted_at').query('prefix', title=keyword)
+
+        return results
+
+
+    def get_query(self, word, interval):
+
+        
+        if interval != "barchasi":
+            today, before = self.interval_range(interval)
+            results = NewsDocument.search().sort('-posted_at').query(Q('range', posted_at={"gte":before, "lte":today}) & Q('prefix', title=word))
+
+        else:
+            results = NewsDocument.search().sort('-posted_at').query('prefix', title=word)
+
+        
+        #results = News.objects.filter(Q(posted_at=today) | Q(posted_at=yesterday)).filter(title__iregex=r'\b'+str(word))
+        
+        return results
+
 
     
-    query = Q('prefix', title=words[0])  # empty Q object
+    def search(self, words, interval):
 
-    for word in words:
+
+        for word in words:
+            if NewsDocument.search().query('prefix', title=word).count() > 0:
+                query = Q('prefix', title=word)  # empty Q object
+                break
+        else:
+            query = Q('prefix', title=words[0])
         
-        if NewsDocument.search().query('prefix', title=word).count() > 0:
-            temp_q = query & Q('prefix', title=word)
 
-            if NewsDocument.search().query(temp_q).count() > 1:
-                query = temp_q
-
-
-    results = NewsDocument.search().query(query)
+        for word in words:
+            if NewsDocument.search().query('prefix', title=word).count() > 0:
+                temp_q = query & Q('prefix', title=word)
+                if NewsDocument.search().query(temp_q).count() > 1:
+                    query = temp_q
 
 
-    # query = NewsDocument.query( 
-    #         Q(
-    #             "range",
-    #             lastModifiedDate={
-    #                 "gte": "now-%dd" % 1,
-    #                 "lt": "now"
-    #             }
-    #         ) & 
-    #         Q('match', title=value2)
-    #     )
+        if interval != "barchasi":
+            today, before = self.interval_range(interval)
+            query = query & Q('range', posted_at={"gte":before, "lte":today})
 
-    # query = Q(title__icontains=words[0])  # empty Q object
-    # for word in words:
-        
-    #     if News.objects.filter(title__icontains=word).exists():
-    #         temp_q = query & Q(title__icontains=word)
-
-    #         if News.objects.filter(temp_q).count() > 0:
-    #             query = temp_q
-    #             matched_words.append(word)
-            
-    #         print(Q(title__icontains=word))
-    # results = News.objects.filter(query).all()
+        results = NewsDocument.search().sort('-posted_at').query(query)
 
 
-    return results
+        return results
 
 
+    def interval_range(self, state):
+        today = datetime.now(pytz.timezone('Asia/Tashkent')).date()
+        decrement = 1
 
-def get_query(word):
-    today = datetime.now(pytz.timezone('Asia/Tashkent')).date()
+        if state == "songilari":
+            decrement = 1
+        elif state == "haftalik":
+            decrement = 7
+        elif state == "oylik":
+            decrement = 30
 
+        before = (today-timedelta(decrement))
 
-    yesterday = (today-timedelta(1))
+        return today, before
 
-    results = NewsDocument.search().query(Q('range', posted_at={"gte":yesterday, "lte":today}) & Q('prefix', title=word))
-
-    print("Get Query: ", results.count())
-
-    #results = News.objects.filter(Q(posted_at=today) | Q(posted_at=yesterday)).filter(title__iregex=r'\b'+str(word))
     
-    return results
-
-
-
-def clean_keywords(text):
-
-    text = text.replace(",", " ").lower()
-
-    text = re.sub("[^a-zA-Z' ]+", "", text)
-    
-    keywords = [word.strip().replace("'", "‘") for word in text.split()]
-
-    return keywords
-        
-
-
-
-
-def get_quaries(keywords):
-
-    results = {}
-
-
-    for keyword in keywords:
-        res = get_query(keyword)
-        results[keyword] = res
-
-    return results
 
 
 
@@ -126,31 +126,44 @@ def get_quaries(keywords):
 
 def index(request):
 
+    helper = Helper()
+
     all_words = WatchList.objects.all()
     dic = {}
+    today, before = helper.interval_range("songilari")
+    option = request.session.get('interval')
 
-    today = datetime.now(pytz.timezone('Asia/Tashkent')).date()
-    yesterday = (today-timedelta(1))
+    # if option == "barchasi" and not request.user.is_authenticated():
+    #     return 
 
-    #print(all_words.count())
+    if not option:
+        option = 'songilari'
 
     for word in all_words:
-        results = NewsDocument.search().query(Q('range', posted_at={"gte":yesterday, "lte":today}) & Q('prefix', title=word.word)).count()
+
+        results = NewsDocument.search().query(Q('range', posted_at={"gte":before, "lte":today}) & Q('prefix', title=word.word)).count()
         if results > 2:
             results=results//2
             dic[word] = results
 
-    
-
     if request.method == "POST":
-        test = request.POST["keywords"]
+        text = request.POST["keywords"]
+        interval = request.POST["interval"]
 
+        request.session['text'] = text
 
-        request.session['text'] = test
+        if interval == "barchasi" and not request.user.is_authenticated:
+            request.session['interval'] = "songilari"
+            messages.add_message(request, messages.WARNING, "Barchasini ko'rish saytdan ro'yhatdan o'ting!")
+
+        else:
+
+            request.session['interval'] = interval
+
 
         return redirect('query_keywords')
         
-    return render(request, 'index.html', {'dic':dic})
+    return render(request, 'index.html', {'dic':dic, 'option':option})
 
 
 
@@ -158,17 +171,18 @@ def index(request):
 
 def query_keywords(request):
 
+    helper = Helper()
+
     text = request.session.get('text')
+    interval = request.session.get('interval')
 
-    keywords = clean_keywords(text)
-
+    keywords = helper.clean_keywords(text)
     matched_news = []
 
     if len(keywords) > 0:
-        matched_news = search(keywords)
+        matched_news = helper.search(keywords, interval)
     
-
-    results = get_quaries(keywords)
+    results = helper.get_quaries(keywords, interval)
 
     return render(request, 'query_keywords.html', {'results':results, 'matches':matched_news})
 
@@ -177,12 +191,14 @@ def query_keywords(request):
 
 
 def query_news(request, word):
-    
 
-    search = get_query(word)
+    helper = Helper()
+
+    interval = request.session.get('interval')
+
+    search = helper.get_query(word, interval)
 
     limit = settings.POSTS_PER_PAGE
-
 
     q = request.GET.get('q')
     page = int(request.GET.get('page', '1'))
@@ -213,11 +229,15 @@ def query_news(request, word):
 
 def category_view(request, category):
 
-    today = datetime.now(pytz.timezone('Asia/Tashkent')).date()
-    yesterday = (today-timedelta(1))
+    helper = Helper()
+
+    # today = datetime.now(pytz.timezone('Asia/Tashkent')).date()
+    # yesterday = (today-timedelta(1))
+
+    interval = request.session.get('interval')
+    today, before = helper.interval_range(interval)
 
     limit = settings.POSTS_PER_PAGE
-
 
     q = request.GET.get('q')
     page = int(request.GET.get('page', '1'))
@@ -225,7 +245,7 @@ def category_view(request, category):
     end = start + limit
 
     #news = News.objects.filter(Q(posted_at=today) | Q(posted_at=yesterday)).filter(category=category)
-    news = NewsDocument.search().query(Q('range', posted_at={"gte":yesterday, "lte":today}) & Q('match', category=category))
+    news = NewsDocument.search().query(Q('range', posted_at={"gte":before, "lte":today}) & Q('match', category=category))
     
 
     paginator = Paginator(news, limit)
@@ -240,7 +260,6 @@ def category_view(request, category):
         page_obj = paginator.get_page(paginator.num_pages)
     
 
-
     cnt = news.count()
     cat = category[0].upper()+category[1:]
     info={'category':cat, 'count':cnt}
@@ -250,6 +269,11 @@ def category_view(request, category):
 
 @login_required
 def profile(request):
+
+    helper = Helper()
+
+    interval = 'songilari'
+
 
     if request.is_ajax():
 
@@ -263,15 +287,18 @@ def profile(request):
                 remove_word.users.remove(request.user)
 
         else:
-            usr_input = request.POST.get('keywords', None) 
-            print(usr_input)
+            usr_input = request.POST.get('keywords', None)
+            raw_interval = request.POST.get('interval', None)
+        
+            if raw_interval:
+                interval = raw_interval
+                request.session['interval'] = interval
 
-            mykeys = Keywords.objects.all()
 
-            print(mykeys)
+            # print(mykeys)
 
             if usr_input:
-                words = clean_keywords(usr_input)
+                words = helper.clean_keywords(usr_input)
                 
                 for item in words:
 
@@ -279,6 +306,9 @@ def profile(request):
 
                     if not request.user in cur_word.users.all():
                         cur_word.users.add(request.user)
+
+
+        
                     
         rawwords = Keywords.objects.filter(users=request.user)
     
@@ -288,40 +318,46 @@ def profile(request):
 
         matched_news = []
 
-        for item in search(keywords):
+        count_words = {}
+
+        for item in helper.search(keywords, interval):
+            
             d = {'title': item.title,
                     'link': item.link,
                     'views': item.views,
                     'category': item.category,
-                    'posted_at': item.posted_at,
+                    'posted_at': item.posted_at.strftime("%d %b %y"),
                     'source': item.source}
             matched_news.append(d)
 
-        print(keywords)
+        # print(keywords)
 
 
         result = {}
 
-        for keyword in keywords:
-            res = get_query(keyword)
+        for keyword in rawwords:
+            res = helper.get_query(keyword.word, interval)
+
+            count_words[keyword.word] = res.count()
+
+            mywords.append({'word':keyword.word, 
+                            'id':keyword.id})
+            
             lak = []
             for item in res:
                 d = {'title': item.title,
                      'link': item.link,
                      'views': item.views,
                      'category': item.category,
-                     'posted_at': item.posted_at,
+                     'posted_at': item.posted_at.strftime("%d %b %y"),
                      'source': item.source}
                 lak.append(d)
 
-            result[keyword] = lak
+            result[keyword.word] = lak
 
-        
-        for item in rawwords:
-            mywords.append({'word':item.word, 
-                            'id':item.id})
 
-        response = {'words':mywords, 'news':result, 'matches':matched_news, 'keywords':keywords}
+
+        response = {'words':mywords, 'news':result, 'matches':matched_news, 'keywords':keywords, 'count_words':count_words}
         
         return JsonResponse(response)
     

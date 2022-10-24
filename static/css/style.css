@@ -91,6 +91,10 @@ body {
     text-shadow: 0 .05rem .1rem rgba(0, 0, 0, .5);
 }
 
+.cover-heading{
+  font: bold 100 15px/5px var(--poppins);
+}
+
 .cover-container {
   max-width: 70em;
 }
@@ -151,6 +155,10 @@ body {
   border-bottom-color: rgba(255, 255, 255, .25);
 }
 
+
+.col-md-8, .col-md-4 {
+  padding: 10px;
+}
 
 
 

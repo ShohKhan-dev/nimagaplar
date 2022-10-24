@@ -25,11 +25,12 @@ services:
     build: .
     volumes:
       - .:/django
-    ports:
-      - 8000:8000
+      - static_volume:/django/staticfiles
+    expose:
+      - 8000
     image: app:django
     container_name: django_container
-    command:  bash -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    command:  bash -c "gunicorn core.wsgi:application --bind 0.0.0.0:8000"
     depends_on:
       - mysql
       - es
@@ -61,7 +62,14 @@ services:
       - redis
       - celery
 
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/django/staticfiles
+    ports:
+      - "80:80"
+    depends_on:
+      - app
 
-
-    
-      
+volumes:
+  static_volume:

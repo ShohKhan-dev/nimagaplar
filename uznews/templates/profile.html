@@ -18,6 +18,15 @@
                 <input type="text"  class="form-control" placeholder="Keywords" aria-label="Keywords" name="keyword-input" id="keyword-input" aria-describedby="basic-addon1" required>
 
             </div>
+
+            <div class="col-md-4">
+                <select class="form-control" name="interval" id="interval" value="oylik" onchange="ajax_submit();return false;">
+                    <option value="songilari">So'ngilari</option>
+                    <option value="haftalik">Haftalik</option>
+                    <option value="oylik">Oylik</option>
+                    <option value="barchasi">Barchasi</option>
+                </select>
+            </div>
             
         </div>
     </form>
@@ -68,13 +77,15 @@
     const matchings = document.getElementById('matched-news');
     const keyword_in = document.getElementById('keyword-input');
     const news_list = document.getElementById('news-list');
+    // const interval_option = document.getElementById('interval');
 
     function makehtml(res){
 
         const keyword_data = res.words;
         const news = res.news;
         const matchs = res.matches;
-        const keywords = res.keywords
+        const keywords = res.keywords;
+        const count_words = res.count_words;
 
         // console.log(news);
 
@@ -152,15 +163,17 @@
 
                 const all_url = "/news/"+key;
 
+                
+
                 if (value.length == 0){
-                    news_list.innerHTML += `<h4 class="text-left">${key} <small>(${value.length})</small></h4>`
+                    news_list.innerHTML += `<h4 class="text-left">${key} <small>(${count_words[key]})</small></h4>`
                     
                 }
 
                 else{
                     news_list.innerHTML += `<div class="keyword-menu mt-4">
                                             <a href=${all_url} class="btn btn-sm btn-dark float-right">Barchasi</a>
-                                            <h4 class="text-left">${key} <small>(${value.length})</small></h4>
+                                            <h4 class="text-left">${key} <small>(${count_words[key]})</small></h4>
                                         </div>`
 
                     const slicedArray = news[key].slice(0, 5);
@@ -238,13 +251,13 @@
 
     function ajax_submit()
     {
-          
-        
+
         $.ajax({
             type : "POST", 
             url: "{% url 'profile' %}",
             data: {
                 keywords : $('#keyword-input').val(),
+                interval : $('#interval').val(),
                 csrfmiddlewaretoken: '{{ csrf_token }}'
         
             },
@@ -252,6 +265,8 @@
             
             success: function(res){
                 keyword_in.value = '';
+
+
                 
                 // const data = res.words;
 

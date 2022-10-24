@@ -20,9 +20,24 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /django
 
+RUN mkdir staticfiles
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
 COPY requirements.txt requirements.txt
 
 # RUN python -m pip install --upgrade pip
 
 RUN pip3 install -r requirements.txt
 
+
+# copy entrypoint.sh
+COPY entrypoint.sh entrypoint.sh
+RUN chmod +x entrypoint.sh
+
+
+
+# run entrypoint.prod.sh
+ENTRYPOINT ["/django/entrypoint.sh"]
