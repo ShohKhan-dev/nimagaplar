@@ -21,7 +21,7 @@
 
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg navbar-dark border-bottom border-dark">
         <div class="container">
         <a class="navbar-brand" href="{% url 'index' %}"><h3><strong>NimaGaplar</strong></h3></a> 
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
@@ -54,7 +54,7 @@
             </ul>
           </div>
         </div>
-      </nav>
+    </nav>
 
     
 
@@ -66,31 +66,33 @@
         
     
 
-    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
-        <div class="row">
-            <div class="col-lg-8 mx-auto">
-                <div class="masthead text-center mb-2 ">
-                    <div class="inner">
+        <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="masthead text-center mb-2 ">
+                        <div class="inner">
 
-                        <div class="nav-masthead justify-content-center">
-                        
+                            <div class="nav-masthead justify-content-center">
+                            
 
-                            <a class="nav-link-cat {% if info.category == 'Mahalliy' %}active {% endif %}" href="{% url 'category_view' 'mahalliy' %}">Mahalliy</a>
-                                    
-                            <a class="nav-link-cat {% if info.category == 'Dunyo' %}active {% endif %}" href="{% url 'category_view' 'dunyo' %}">Dunyo</a>
-                        
-                            <a class="nav-link-cat {% if info.category == 'Jamiyat' %}active {% endif %}" href="{% url 'category_view' 'jamiyat' %}">Jamiyat</a>
-                        
-                            <a class="nav-link-cat {% if info.category == 'Sport' %}active {% endif %}" href="{% url 'category_view' 'sport' %}">Sport</a>
-                        
-                            <a class="nav-link-cat {% if info.category == 'Iqtisodiyot' %}active {% endif %}" href="{% url 'category_view' 'iqtisodiyot' %}">Iqtisodiyot</a>
-                        
-                            <a class="nav-link-cat {% if info.category == 'Texnalogiyalar' %}active {% endif %}" href="{% url 'category_view' 'texnalogiyalar' %}">Texnalogiyalar</a>
+                                <a class="nav-link-cat {% if info.category == 'Mahalliy' %}active {% endif %}" href="{% url 'category_view' 'mahalliy' %}">Mahalliy</a>
+                                        
+                                <a class="nav-link-cat {% if info.category == 'Dunyo' %}active {% endif %}" href="{% url 'category_view' 'dunyo' %}">Dunyo</a>
+                            
+                                <a class="nav-link-cat {% if info.category == 'Jamiyat' %}active {% endif %}" href="{% url 'category_view' 'jamiyat' %}">Jamiyat</a>
+                            
+                                <a class="nav-link-cat {% if info.category == 'Sport' %}active {% endif %}" href="{% url 'category_view' 'sport' %}">Sport</a>
+                            
+                                <a class="nav-link-cat {% if info.category == 'Iqtisodiyot' %}active {% endif %}" href="{% url 'category_view' 'iqtisodiyot' %}">Iqtisodiyot</a>
+                            
+                                <a class="nav-link-cat {% if info.category == 'Texnalogiyalar' %}active {% endif %}" href="{% url 'category_view' 'texnalogiyalar' %}">Texnalogiyalar</a>
+
+                                <a class="nav-link-cat {% if info.category == 'Lifestyle' %}active {% endif %}" href="{% url 'category_view' 'lifestyle' %}">LifeStyle</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
         
             
@@ -102,16 +104,19 @@
                 </div>
             </div>
 
-        </main>
+            <footer class="mastfoot mt-auto text-center">
+                <p><small>Developed by <b><a href="https://www.linkedin.com/in/shohkingkhan/" target="_blank">Shohjahon</a></b></small></p>
+            </footer>
+
+
+            
+
+        </div>
+    </main>
+        
+        
         
     
-
-        
-        
-        <footer class="mastfoot mt-auto text-center">
-            <p><small><b>Developed by</b> shohjahon</small></p>
-        </footer>
-    </div>
 
     
     

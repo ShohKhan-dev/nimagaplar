@@ -24,6 +24,7 @@ urlpatterns = [
 
     path('filter/',  views.FilterView.as_view(), name='uznews'),
     path('filter/directword/',  views.DirectWord.as_view(), name='uznews_directword'),
+    path('filter/addword/',  views.AddWord.as_view(), name='uznews_addword'),
 ]
 
 handler404 = 'uznews.views.error_404_view'

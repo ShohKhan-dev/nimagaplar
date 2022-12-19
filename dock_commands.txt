@@ -7,3 +7,7 @@ docker-compose run --rm app django-admin startproject core .   ## One time comma
 docker-compose up                                              ## Publish docker-compose 
 
 docker exec -it django_container /bin/bash                    ## To run command in terminal
+
+
+Run it:
+docker-compose -f docker-compose.prod.yaml up -d --build

@@ -19,6 +19,7 @@ from django.contrib.auth import authenticate, login
 
 from django.contrib import messages
 
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 
@@ -370,11 +371,17 @@ def error_404_view(request, exception):
     return render(request,'404.html')
 
 
-class FilterView(ListView):
+class FilterView(LoginRequiredMixin, ListView):
     model = WaitList
     template_name = 'filter.html'
     context_object_name = 'words'
     paginate_by = 200
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_super"] = self.request.user.is_superuser
+        return context
+
     
 
 
@@ -403,6 +410,37 @@ class DirectWord(View):
         data = {
             'deleted': True
         }
+        return JsonResponse(data)
+
+
+class AddWord(View):
+    def get(self, request):
+
+        data = {
+            'saved': False
+        }
+
+        word = request.GET.get('word', None)
+
+        print("New added word:",word)
+
+        if (not WatchList.objects.filter(word=word).exists()):
+        
+            if IgnoreList.objects.filter(word=word).exists():
+                IgnoreList.objects.get(word=word).delete()
+
+            if WaitList.objects.filter(word=word).exists():
+                WaitList.objects.get(word=word).delete()
+            
+
+            WatchList.objects.create(word=word)
+
+            data = {
+                'saved': True
+            }
+        
+
+        
         return JsonResponse(data)
 
 

@@ -7,7 +7,16 @@
 </head>
 <body>
     <h1>Filtering HERE!</h1>
-    {% for word in words %}
+    <div class="add-keyword">
+        <h2>Add new Keyword</h2>
+        <form id="form-add-keyword" action=".">
+            Keyword: <input type="text" name="new-keyword" id="addNew-keyword">
+            <input type="button" onclick="submitNew()" value="Submit">
+        </form>
+    </div>
+    <div class="accept-ignore">
+        <h2>Accept or Ignore keywords:</h2>
+        {% for word in words %}
         
         <div id="word-{{word.id}}">
             <hr>
@@ -21,6 +30,9 @@
         </div>
         
     {% endfor %}
+
+    </div>
+    
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -47,6 +59,36 @@
                     }
                 }
             });
+        };
+
+        function submitNew() {
+            var form = document.getElementById("form-add-keyword");
+            var text = form.elements[0].value;
+            const input_field = document.getElementById("#new-keyword")
+
+            const myArray = text.split(" ");
+
+            console.log("--"+text+"--");
+
+            var word = myArray[0];
+            console.log(word);
+
+            $.ajax({
+                url: '{% url "uznews_addword" %}',
+                data: {
+                    'word': word,
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.saved) {
+                        form.elements[0].value = '';
+                    }
+                }
+            });
+
+            
+
+            
         }
     </script>
 

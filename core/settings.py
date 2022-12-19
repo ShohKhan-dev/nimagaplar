@@ -92,36 +92,29 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'citizix_db',
-#         'USER': 'citizix_user',
-#         'PASSWORD': 'An0thrS3crt',
-#         'HOST': 'mysql',
-#         'PORT': '3306',
-#     }
-# }
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': config('DB_ENGINE'),
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
-        'OPTIONS': {'charset': 'utf8mb4'}
+if config('PRODUCTION', cast=bool):
+
+    DATABASES = {
+        'default': {
+            'ENGINE': config('DB_ENGINE'),
+            'NAME': config('DB_NAME'),
+            'USER': config('DB_USER'),
+            'PASSWORD': config('DB_PASSWORD'),
+            'HOST': config('DB_HOST'),
+            'PORT': config('DB_PORT'),
+            'OPTIONS': {'charset': 'utf8mb4'}
+        }
     }
-}
+
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 
@@ -200,4 +193,4 @@ LOGOUT_REDIRECT_URL = '/'
 
 TELEGRAM_BOT_NAME = 'nimagaplarOffbot'
 TELEGRAM_BOT_TOKEN = '5390984413:AAE9YbOr7eNpzCCa01nvGZ6T2AR9hSEd2yA' 
-TELEGRAM_LOGIN_REDIRECT_URL = 'https://nimagaplar.loca.lt/authenticate/'
+TELEGRAM_LOGIN_REDIRECT_URL = config('TELEGRAM_LOGIN_URL')+'/authenticate/'

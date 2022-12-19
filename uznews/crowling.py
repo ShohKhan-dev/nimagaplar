@@ -70,6 +70,10 @@ class Crowler():
                         category = "iqtisodiyot"
                     elif category == "Fan va texnika":
                         category = "texnalogiyalar"
+                    elif category == "Light":
+                        category = "lifestyle"
+                    else:
+                        category = "lifestyle"
                             
                     kun_news.append(list((title, link, views, category, date, "kun.uz")))
                     facing_new = True
@@ -91,7 +95,7 @@ class Crowler():
         today = now.strftime("%Y/%m/%d")
         yesterday = day_before.strftime("%Y/%m/%d")
 
-        categories = ["mahalliy", "dunyo", "texnologiyalar", "madaniyat", "avto", "sport", "foto"]
+        categories = ["mahalliy", "dunyo", "texnologiyalar", "madaniyat", "avto", "sport", "foto", "lifestyle"]
 
         for category in categories:
             is_new = True
@@ -231,8 +235,8 @@ class Crowler():
                     word = self.stem(word)
                     if (not WaitList.objects.filter(word=word).exists()) and (not WatchList.objects.filter(word=word).exists()) and (not IgnoreList.objects.filter(word=word).exists()):
                         #tag = WaitList(word = word)
-                        if not WaitList.objects.filter(word=word).exists():
-                            WaitList.objects.create(word=word)
+                        
+                        WaitList.objects.create(word=word)
                         #.save()
         print("DONE!")
 
