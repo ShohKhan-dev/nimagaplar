@@ -36,7 +36,7 @@ DEBUG = config('DEBUG', cast=bool)
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = True
 
-ALLOWED_HOSTS = ['nimagaplar.loca.lt', '127.0.0.1', '172.25.208.1']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS').split(' ')
 
 
 # Application definition
