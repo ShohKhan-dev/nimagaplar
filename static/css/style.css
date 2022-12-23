@@ -1,5 +1,6 @@
 /* Links */
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap');
 
 a,
 a:focus,
@@ -34,12 +35,12 @@ a:hover{
 }
 
 .navbar-brand{
-  font: normal 100 15px/2px var(--poppins);
+  font: normal 100 15px/2px;
   
 }
 
 .header_area .main-menu .nav-item .nav-link{
-  font: normal 500 15px/2px var(--poppins);
+  font: normal 500 15px/2px;
   text-transform: uppercase;
   padding: 2rem 1rem;
   color: #141313;
@@ -61,7 +62,7 @@ a:hover{
 
 
 
-.navbar{
+.navbar_fixed{
   position: fixed;
   width: 100%;
   top: -1px;
@@ -81,7 +82,7 @@ a:hover{
 
 html, body {
     /* font-family: quicksand,sans-serif; */
-    font-family: var(--poppins);
+    font-family: 'Poppins', sans-serif;
     
     height: 100%;
     background-color: #25282c;

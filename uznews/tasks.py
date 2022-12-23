@@ -14,5 +14,5 @@ def crowler_task():
     crowler.run()
 
 
-    ranum = random.randint(0,100)
-    RandomNumber.objects.create(numb=ranum)
+    # ranum = random.randint(0,100)
+    # RandomNumber.objects.create(numb=ranum)

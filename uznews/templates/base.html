@@ -7,6 +7,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/all.min.css' %}">
 
@@ -23,42 +27,39 @@
 
     <nav class="navbar navbar-expand-lg navbar-dark border-bottom border-dark">
         <div class="container">
-        <a class="navbar-brand" href="{% url 'index' %}"><h3><strong>NimaGaplar</strong></h3></a> 
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-      
-          <div class="collapse navbar-collapse" id="navbarsExample07">
-            <div class="mr-auto"></div>
+            <a class="navbar-brand" href="{% url 'index' %}"><h3><strong>NimaGaplar</strong></h3></a> 
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample07" aria-controls="navbarsExample07" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        
+            <div class="collapse navbar-collapse" id="navbarsExample07">
+                <div class="mr-auto"></div>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                        
+                        <li class="nav-item ">
+                            <a class="nav-link" href="{% url 'profile' %}">Profile</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Chiqish</a>
+                        </li>
 
-            <ul class="navbar-nav">
-                {% if user.is_authenticated %}
-                    
-                    <li class="nav-item ">
-                        <a class="nav-link" href="{% url 'profile' %}">Profile</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'logout' %}">Chiqish</a>
-                    </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a href="." class="bt" data-toggle="modal" data-target="#loginModal">
+                                Kirish
+                            </a>  
+                        </li>
+                    {% endif %}
 
-                {% else %}
-                    <li class="nav-item">
-                        <a href="." class="bt" data-toggle="modal" data-target="#loginModal">
-                            Kirish
-                        </a>  
-                    
-                    </li>
-
-                {% endif %}
-
-            </ul>
-          </div>
+                </ul>
+            </div>
         </div>
     </nav>
 
     
 
-    <main class="site-main">
+    <main class="site-main mt-10">
 
         <div class="telegram-login-modal">
             {% include "login_modal.html" %}
