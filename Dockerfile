@@ -42,4 +42,4 @@ RUN chmod +x /entrypoint.sh
 
 
 # run entrypoint.prod.sh
-ENTRYPOINT ["/django/entrypoint.sh"]
+ENTRYPOINT ["sh", "/django/entrypoint.sh"]

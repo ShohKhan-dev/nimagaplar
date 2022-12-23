@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 
+from celery.schedules import crontab
+
+
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -52,9 +55,11 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_elasticsearch_dsl',
     'django_elasticsearch_dsl_drf',
-    'uznews.apps.UznewsConfig',
+    'uznews',
     'django_telegram_login',
     'django_crontab',
+
+
 ]
 
 MIDDLEWARE = [
@@ -180,10 +185,21 @@ ELASTICSEARCH_DSL = {
     }
 }
 
+
 CELERY_RESULT_BACKEND = "django-db"
 
 CELERY_BROKER_URL = "redis://redis:6379"
 CELERY_RESULT_BACKEND = "redis://redis:6379"
+
+CELERY_BEAT_SCHEDULE = {
+    "sample_task": {
+        "task": "uznews.tasks.sample_task",
+        "schedule": crontab(minute="*/10"),
+    }
+}
+
+
+
 
 ACCOUNT_LOGOUT_ON_GET = True
 
