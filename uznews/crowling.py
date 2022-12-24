@@ -209,6 +209,13 @@ class Crowler():
 
         for news in all_news:
             title = news[0]
+            title = title.replace("‘", "'")
+            title = title.replace("—", "-")
+            title = title.replace("“", "''")
+            title = title.replace("”", "''")
+        
+
+
             link = news[1]
             views = int(news[2])
             category = news[3]
