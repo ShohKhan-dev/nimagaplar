@@ -4,7 +4,7 @@ import json
 import pytz
 import re
 from datetime import datetime
-
+import time
 import os
 import django
 
@@ -12,7 +12,7 @@ import django
 os.environ['DJANGO_SETTINGS_MODULE'] = 'core.settings'
 django.setup()
 
-from uznews.models import WaitList, WatchList, IgnoreList, News
+from uznews.models import WaitList, WatchList, IgnoreList, News, RandomNumber
 
 class GetAll():
 
@@ -71,8 +71,27 @@ class GetAll():
                         category = "lifestyle"
 
 
+                    
+                    title = title.replace("‘", "'")
+                    title = title.replace("—", "-")
+                    title = title.replace("“", "''")
+                    title = title.replace("”", "''")
+
+                    views = int(views)
+
+                    posted_at = datetime.strptime(date, '%Y/%m/%d').date()
+                    source = "kun.uz"
+
+
+                    if not News.objects.filter(link=link).exists():
+                        data = News(title = title, link = link, views = views, category=category, posted_at = posted_at,  source = source)
+                        data.save()
+
+                        kun_news.append(data)
+
+
                 
-                    kun_news.append(list((title, link, views, category, date, "kun.uz")))
+                    # kun_news.append(list((title, link, views, category, date, "kun.uz")))
 
                 
                     # my_d["title"] = title
@@ -89,6 +108,9 @@ class GetAll():
                         break
                 
                 page+=1
+
+                if page%100==0:
+                    print(page)
 
             except Exception as e:
                 print(e)
@@ -130,7 +152,25 @@ class GetAll():
                         title = main.text
                         views = article.find('span', class_="meta_views").text.replace(" ", "")
 
-                        daryo_news.append(list((title, link, views, category, date, "daryo.uz")))
+
+                        title = title.replace("‘", "'")
+                        title = title.replace("—", "-")
+                        title = title.replace("“", "''")
+                        title = title.replace("”", "''")
+
+                        views = int(views)
+    
+                        posted_at = datetime.strptime(date, '%Y/%m/%d').date()
+                        source = "daryo.uz"
+
+
+                        if not News.objects.filter(link=link).exists():
+                            data = News(title = title, link = link, views = views, category=category, posted_at = posted_at,  source = source)
+                            data.save()
+
+                            daryo_news.append(data)
+
+                        # daryo_news.append(list((title, link, views, category, date, "daryo.uz")))
 
                         # my_d["title"] = title
                         # my_d["link"] = link
@@ -142,6 +182,9 @@ class GetAll():
 
                 
                     page+=1
+
+                    if page%100==0:
+                        print(category, page)
                 
                 except Exception as e:
                     print(e)
@@ -175,7 +218,7 @@ class GetAll():
             title = title.replace("—", "-")
             title = title.replace("“", "''")
             title = title.replace("”", "''")
-            
+
             link = news[1]
             views = int(news[2])
             category = news[3]
@@ -198,14 +241,14 @@ class GetAll():
 
         print("All Kun uz news: ", len(kun_news))
 
-        self.write_data(kun_news)
+        # self.write_data(kun_news)
 
 
         daryo_news = self.daryo_uz()
 
         print("All Daryo uz news: ", len(daryo_news))
 
-        self.write_data(daryo_news)
+        # self.write_data(daryo_news)
 
     
 
@@ -214,6 +257,7 @@ class GetAll():
 getall = GetAll()
 
 getall.run()
+
 
 # getall.kun_uz()
 # getall.daryo_uz()

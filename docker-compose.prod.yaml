@@ -36,6 +36,17 @@ services:
       - es
       - redis
 
+  crowler:
+    build: .
+    volumes:
+      - .:/django
+
+    image: app:django
+    container_name: crowler_task
+    command:  bash -c "python3 getall.py"
+    depends_on:
+      - app
+
   redis:
     image: redis:alpine
     ports:

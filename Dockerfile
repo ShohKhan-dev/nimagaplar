@@ -33,6 +33,8 @@ COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
 
+
+
 # copy entrypoint.sh
 
 
@@ -43,3 +45,4 @@ RUN chmod +x /entrypoint.sh
 
 # run entrypoint.prod.sh
 ENTRYPOINT ["sh", "/django/entrypoint.sh"]
+
