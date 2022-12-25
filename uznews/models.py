@@ -103,8 +103,8 @@ class WaitList(models.Model):
 
 
 class News(models.Model):
-    title = models.CharField(max_length=255)
-    link = models.CharField(max_length=255, unique=True)
+    title = models.CharField(max_length=500)
+    link = models.CharField(max_length=500, unique=True)
     views = models.IntegerField()
     category = models.CharField(max_length=25, null=False, blank=True)
     posted_at = models.DateField()

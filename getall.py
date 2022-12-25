@@ -24,7 +24,7 @@ class GetAll():
     def kun_uz(self):
 
         is_new = True
-        page = 1
+        page = 1862  # Stopped on 1863 - data too long for link
 
         kun_news = []
 
@@ -121,11 +121,12 @@ class GetAll():
 
     def daryo_uz(self):
     
-        categories = ["mahalliy", "dunyo", "texnologiyalar", "madaniyat", "avto", "sport", "foto", "lifestyle"]
+        # categories = ["mahalliy", "dunyo", "texnologiyalar", "madaniyat", "avto", "sport", "foto", "lifestyle"]
+        categories = ["dunyo"]
         daryo_news = []
 
         for category in categories:
-            page = 1
+            page = 1105
 
             while True:
 
