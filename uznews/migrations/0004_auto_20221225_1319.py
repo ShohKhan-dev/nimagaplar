@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='news',
             name='link',
-            field=models.CharField(max_length=500),
+            field=models.CharField(max_length=800),
         ),
         migrations.AlterField(
             model_name='news',

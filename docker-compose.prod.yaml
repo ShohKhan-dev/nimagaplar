@@ -36,21 +36,22 @@ services:
       - es
       - redis
 
-  crowler:
-    build: .
-    volumes:
-      - .:/django
+  # crowler:
+  #   build: .
+  #   volumes:
+  #     - .:/django
 
-    image: app:django
-    container_name: crowler_task
-    command:  bash -c "python3 getall.py"
-    depends_on:
-      - app
+  #   image: app:django
+  #   container_name: crowler_task
+  #   command:  bash -c "python3 getall.py"
+  #   depends_on:
+  #     - app
 
   redis:
     image: redis:alpine
     ports:
       - 6379:6379
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
 
   celery:
     build: .
@@ -61,6 +62,7 @@ services:
       - mysql
       - es
       - redis
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
 
   celery-beat:
     build: .
@@ -72,6 +74,7 @@ services:
       - es
       - redis
       - celery
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
 
   nginx:
     build: ./nginx

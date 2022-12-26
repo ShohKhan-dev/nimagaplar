@@ -115,6 +115,7 @@ class GetAll():
             except Exception as e:
                 print(e)
                 print("stopped on page: ",page)
+                page+=1
                 break
 
         return kun_news
@@ -255,9 +256,9 @@ class GetAll():
 
 
 
-getall = GetAll()
-
-getall.run()
+# getall = GetAll()
+ 
+# getall.run()
 
 
 # getall.kun_uz()
