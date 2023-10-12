@@ -2,7 +2,7 @@
 
 ![image](main.jpg)
 
-## Live: [nimagaplar.uz](http://65.109.138.63/))
+## Live: [nimagaplar.uz](http://65.109.138.63/)
 
 ![python](https://img.shields.io/badge/-python-grey?style=for-the-badge&logo=python&logoColor=white&labelColor=306998)
 ![django](https://img.shields.io/badge/-django-grey?style=for-the-badge&logo=django&logoColor=white&labelColor=092e20)
@@ -30,6 +30,9 @@
 # About
 
 Easy Search and Filter news that are real time scraped from several news websites. Stamming words, and get keywords to see most commond words in news.
+
+
+![image](categ.jpg)
 
 #### Django project run
 
